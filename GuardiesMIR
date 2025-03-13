@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendari de Guàrdies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let currentDate = new Date();
+            let selectedMonth = currentDate.getMonth();
+            let selectedYear = currentDate.getFullYear();
+            let mode = "view"; // Can be "view" or "edit"
+            const adminPass = "admin123";
+            const viewPass = "view123";
+
+            function generateCalendar(month, year) {
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                document.getElementById("month-year").innerText = `${year} - ${new Intl.DateTimeFormat('ca-ES', { month: 'long' }).format(new Date(year, month))}`;
+                
+                let calendar = "";
+                for (let i = 0; i < firstDay; i++) {
+                    calendar += `<div class='border p-4 bg-gray-200'></div>`;
+                }
+                for (let day = 1; day <= daysInMonth; day++) {
+                    calendar += `<div class='border p-4 h-32 bg-white'>
+                        <div class='text-center font-bold'>${day}</div>
+                        <div contenteditable='${mode === "edit"}' class='text-sm bg-blue-100 text-blue-800 p-1 rounded'>Guàrdia 1</div>
+                        <div contenteditable='${mode === "edit"}' class='text-sm bg-green-100 text-green-800 p-1 rounded'>Guàrdia 2</div>
+                        <div contenteditable='${mode === "edit"}' class='text-sm bg-yellow-100 text-yellow-800 p-1 rounded'>Reforç</div>
+                        <div contenteditable='${mode === "edit"}' class='text-sm bg-red-100 text-red-800 p-1 rounded hidden optional-shift'>Guàrdia Extra</div>
+                    </div>`;
+                }
+                document.getElementById("calendar").innerHTML = calendar;
+            }
+            
+            function changeMonth(offset) {
+                selectedMonth += offset;
+                if (selectedMonth > 11) {
+                    selectedMonth = 0;
+                    selectedYear++;
+                } else if (selectedMonth < 0) {
+                    selectedMonth = 11;
+                    selectedYear--;
+                }
+                generateCalendar(selectedMonth, selectedYear);
+            }
+            
+            function login() {
+                let pass = prompt("Introdueix la contrasenya:");
+                if (pass === adminPass) {
+                    mode = "edit";
+                } else if (pass === viewPass) {
+                    mode = "view";
+                } else {
+                    alert("Contrasenya incorrecta");
+                    return;
+                }
+                generateCalendar(selectedMonth, selectedYear);
+            }
+            
+            document.getElementById("prev").addEventListener("click", () => changeMonth(-1));
+            document.getElementById("next").addEventListener("click", () => changeMonth(1));
+            document.getElementById("login").addEventListener("click", login);
+            
+            generateCalendar(selectedMonth, selectedYear);
+        });
+    </script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center p-6">
+    <h1 class="text-2xl font-bold mb-4">Calendari de Guàrdies</h1>
+    <button id="login" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded">Iniciar Sessió</button>
+    <div class="flex items-center mb-4">
+        <button id="prev" class="px-4 py-2 bg-gray-300 rounded">&lt;</button>
+        <h2 id="month-year" class="mx-4 text-lg font-semibold"></h2>
+        <button id="next" class="px-4 py-2 bg-gray-300 rounded">&gt;</button>
+    </div>
+    <div id="calendar" class="grid grid-cols-7 gap-2 w-full max-w-4xl bg-white p-4 rounded-lg shadow-lg"></div>
+</body>
+</html>
